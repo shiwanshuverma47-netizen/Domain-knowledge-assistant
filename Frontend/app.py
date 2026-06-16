@@ -338,8 +338,7 @@ if not st.session_state.messages:
 
 # ─── Chat Input — exact logic from old code ───────────────────────────────────
 question = st.chat_input(
-    "Ask something from your document...",
-    disabled=not st.session_state.pdf_uploaded
+    "Ask something from your document..."
 )
 
 if question:
