@@ -213,7 +213,7 @@ if "pdf_uploaded" not in st.session_state:
 if "pdf_name" not in st.session_state:
     st.session_state.pdf_name = None
 
-BACKEND = "http://127.0.0.1:8000"
+BACKEND = "http://localhost:8000"
 
 # ─── Sidebar ─────────────────────────────────────────────────────────────────
 st.sidebar.empty()
