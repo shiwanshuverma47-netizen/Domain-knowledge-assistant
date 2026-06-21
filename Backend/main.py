@@ -1,9 +1,13 @@
+import shutil
 from fastapi import FastAPI, Depends, HTTPException
 from sqlalchemy.orm import Session
 from fastapi import UploadFile, File
 import os
-from rag import ask_question
-from rag import store_document_in_chroma
+from rag import (
+    ask_question,
+    store_document_in_chroma,
+    clear_chroma_collection
+)
 from pdf_reader import extract_text_from_pdf
 from database import engine, Base, get_db
 from models import User
@@ -177,6 +181,23 @@ async def upload_pdf(
     "chunks_created": total_chunks,
     "text_preview": extracted_text[:500]
 }
+
+# -----------------------------------
+# Delete old uploaded files
+# -----------------------------------
+if os.path.exists(UPLOAD_FOLDER):
+    shutil.rmtree(UPLOAD_FOLDER)
+
+os.makedirs(
+    UPLOAD_FOLDER,
+    exist_ok=True
+)
+
+# -----------------------------------
+# Clear old Chroma collection
+# -----------------------------------
+clear_chroma_collection()
+
 
 # -----------------------------------
 # Chat API
