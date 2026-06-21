@@ -74,6 +74,29 @@ def chunk_text(
 
 
 # -----------------------------------
+# Clear Chroma Collection
+# -----------------------------------
+def clear_chroma_collection():
+    global collection
+
+    try:
+        # Delete old collection
+        client.delete_collection("documents")
+        print("✅ Old Chroma collection deleted.")
+
+    except Exception:
+        # Ignore if collection doesn't exist
+        pass
+
+    # Create fresh empty collection
+    collection = client.get_or_create_collection(
+        name="documents"
+    )
+
+    print("✅ New empty Chroma collection created.")
+
+
+# -----------------------------------
 # Store Document
 # -----------------------------------
 def store_document_in_chroma(
