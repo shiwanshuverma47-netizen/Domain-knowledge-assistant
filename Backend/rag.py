@@ -32,11 +32,18 @@ collection = client.get_or_create_collection(
 )
 
 # -----------------------------------
-# Local Embedding Model
+# Local Embedding Model (Lazy Loaded)
 # -----------------------------------
-embedding_model = SentenceTransformer(
-    "all-MiniLM-L6-v2"
-)
+embedding_model = None
+
+def get_embedding_model():
+    """Lazy load the embedding model on first use"""
+    global embedding_model
+    if embedding_model is None:
+        print("⏳ Loading embedding model (this may take a moment)...")
+        embedding_model = SentenceTransformer("all-MiniLM-L6-v2")
+        print("✅ Embedding model loaded successfully")
+    return embedding_model
 
 
 # -----------------------------------
@@ -102,7 +109,7 @@ def store_document_in_chroma(
     ]
 
     # Create embeddings locally
-    embeddings = embedding_model.encode(
+    embeddings = get_embedding_model().encode(
         chunks
     ).tolist()
 
@@ -124,7 +131,7 @@ def ask_question(
         chat_history = []
 
     # Create query embedding
-    query_embedding = embedding_model.encode(
+    query_embedding = get_embedding_model().encode(
         [question]
     ).tolist()
 

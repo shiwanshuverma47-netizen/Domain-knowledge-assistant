@@ -164,39 +164,31 @@ async def upload_pdf(
         f.write(content)
 
     # Extract text
-    # Extract text
     extracted_text = extract_text_from_pdf(
-    file_path
+        file_path
     )
 
     # Store in ChromaDB
     total_chunks = store_document_in_chroma(
-    extracted_text,
-    file.filename
+        extracted_text,
+        file.filename
     )
 
     return {
-    "message": "PDF uploaded successfully",
-    "file_name": file.filename,
-    "chunks_created": total_chunks,
-    "text_preview": extracted_text[:500]
-}
+        "message": "PDF uploaded successfully",
+        "file_name": file.filename,
+        "chunks_created": total_chunks,
+        "text_preview": extracted_text[:500]
+    }
 
 # -----------------------------------
-# Delete old uploaded files
+# NOTE: Startup cleanup disabled
 # -----------------------------------
-if os.path.exists(UPLOAD_FOLDER):
-    shutil.rmtree(UPLOAD_FOLDER)
-
-os.makedirs(
-    UPLOAD_FOLDER,
-    exist_ok=True
-)
-
-# -----------------------------------
-# Clear old Chroma collection
-# -----------------------------------
-clear_chroma_collection()
+# Uncomment below if you want to clear uploads and Chroma on every startup
+# if os.path.exists(UPLOAD_FOLDER):
+#     shutil.rmtree(UPLOAD_FOLDER)
+# os.makedirs(UPLOAD_FOLDER, exist_ok=True)
+# clear_chroma_collection()
 
 
 # -----------------------------------
