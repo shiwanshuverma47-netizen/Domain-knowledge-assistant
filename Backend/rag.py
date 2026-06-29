@@ -1,4 +1,5 @@
 import chromadb
+from chromadb.utils import embedding_functions
 from groq import Groq
 from dotenv import load_dotenv
 import os
@@ -26,23 +27,16 @@ client = chromadb.PersistentClient(
     path=CHROMA_DB_PATH
 )
 
+# -----------------------------------
+# Lightweight Embedding Function
+# Uses ONNX Runtime (much smaller than PyTorch)
+# -----------------------------------
+embedding_fn = embedding_functions.DefaultEmbeddingFunction()
+
 collection = client.get_or_create_collection(
-    name="documents"
+    name="documents",
+    embedding_function=embedding_fn
 )
-
-# -----------------------------------
-# Local Embedding Model (Lazy Loaded)
-# -----------------------------------
-embedding_model = None
-
-def get_embedding_model():
-    """Lazy load the embedding model on first use"""
-    global embedding_model
-    if embedding_model is None:
-        print("⏳ Loading embedding model (this may take a moment)...")
-        embedding_model = SentenceTransformer("all-MiniLM-L6-v2")
-        print("✅ Embedding model loaded successfully")
-    return embedding_model
 
 
 # -----------------------------------
@@ -87,7 +81,8 @@ def clear_chroma_collection():
 
     # Create fresh empty collection
     collection = client.get_or_create_collection(
-        name="documents"
+        name="documents",
+        embedding_function=embedding_fn
     )
 
     print("✅ New empty Chroma collection created.")
@@ -107,14 +102,10 @@ def store_document_in_chroma(
         for i in range(len(chunks))
     ]
 
-    # Create embeddings locally
-    embeddings = get_embedding_model().encode(
-        chunks
-    ).tolist()
-
+    # Let ChromaDB handle embeddings via its
+    # built-in DefaultEmbeddingFunction (ONNX-based)
     collection.add(
         documents=chunks,
-        embeddings=embeddings,
         ids=ids
     )
 
@@ -129,14 +120,9 @@ def ask_question(
     if chat_history is None:
         chat_history = []
 
-    # Create query embedding
-    query_embedding = get_embedding_model().encode(
-        [question]
-    ).tolist()
-
-    # Search top chunks
+    # Let ChromaDB handle the query embedding
     results = collection.query(
-        query_embeddings=query_embedding,
+        query_texts=[question],
         n_results=3
     )
 
