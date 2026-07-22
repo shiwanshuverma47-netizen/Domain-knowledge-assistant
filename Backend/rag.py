@@ -16,7 +16,7 @@ if not groq_api_key:
 client_groq = Groq(api_key=groq_api_key)
 
 # -----------------------------------
-# ChromaDB Client
+# ChromaDB database  Client
 # -----------------------------------
 CHROMA_DB_PATH = os.path.join(
     os.path.dirname(__file__),
